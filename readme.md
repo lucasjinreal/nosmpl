@@ -10,6 +10,9 @@ This packages provides:
 - [ ] Provide commonly used geoemtry built-in support without torchgeometry or kornia.
 
 
+STAR model download from: https://star.is.tue.mpg.de/downloads
+
+
 ## Examples
 
 Some pipelines build with SMPL2 support.
