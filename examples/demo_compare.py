@@ -7,7 +7,9 @@ from smpl2.smpl2 import SMPL2
 
 
 star = STAR(model_path='data/star_1_1/female/model.npz')
-smpl = SMPL2(model_path='')
+smpl = SMPL2(model_path='/media/jintian/samsung/source/ai/swarm/toolchains/mmkd/vendor/EasyMocap/data/smplx/smpl/SMPL_NEUTRAL.pkl')
+smpl.to('cuda')
+
 
 batch_size = 1
 
@@ -38,7 +40,9 @@ with open(outmesh_path, 'w') as fp:
 print("STAR模型已建立")
 
 
+poses = torch.cuda.FloatTensor(np.zeros((batch_size, 72)))
+poses = Variable(poses, requires_grad=True)
 t0 = time.perf_counter()
-d = smpl(poses, betas, trans)
+d = smpl(betas, poses)
 t1 = time.perf_counter()
 print(t1 - t0)

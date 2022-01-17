@@ -20,8 +20,8 @@ class SMPL2(nn.Module):
     def __init__(
         self,
         model_path,
-        extra_regressor,
-        h36m_regressor,
+        extra_regressor=None,
+        h36m_regressor=None,
         dtype=torch.float32,
     ):
         super(SMPL2, self).__init__()
@@ -57,13 +57,15 @@ class SMPL2(nn.Module):
         weights = torch.tensor(weights, dtype=dtype)
         self.register_buffer("weights", weights)
 
-        extra_regressor = torch.from_numpy(
-            np.load(extra_regressor)).to(self.dtype)
-        self.register_buffer("extra_regressor", extra_regressor)
+        if extra_regressor:
+            extra_regressor = torch.from_numpy(
+                np.load(extra_regressor)).to(self.dtype)
+            self.register_buffer("extra_regressor", extra_regressor)
 
-        h36m_regressor = torch.from_numpy(
-            np.load(h36m_regressor)).to(self.dtype)
-        self.register_buffer("h36m_regressor", h36m_regressor)
+        if h36m_regressor:
+            h36m_regressor = torch.from_numpy(
+                np.load(h36m_regressor)).to(self.dtype)
+            self.register_buffer("h36m_regressor", h36m_regressor)
 
         self.register_buffer("e3", torch.eye(3))
 
