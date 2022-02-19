@@ -1,6 +1,12 @@
-# SMPL2
+# NoSMPL
 
 An enchanced and accelerated SMPL operation which commonly used in 3D human mesh generation. It takes a poses, shapes, cam_trans as inputs, outputs a high-dimensional 3D mesh verts.
+
+However, SMPL codes and models are so messy out there, they have a lot of codes do calculation, some of them can not be easily deployed or accerlarated. So we have `nosmpl` here, it provides:
+
+- build on smplx, but with onnx support;
+- can be inference via onnx;
+- we also demantrated some using scenarios infer with `nosmpl` but without any model, only onnx.
 
 This packages provides:
 
@@ -15,7 +21,7 @@ STAR model download from: https://star.is.tue.mpg.de/downloads
 
 ## Examples
 
-Some pipelines build with SMPL2 support.
+Some pipelines build with `nosmpl` support.
 
 
 

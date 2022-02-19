@@ -1,10 +1,21 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2020 Max-Planck-Gesellschaft zur Förderung der Wissenschaften e.V. (MPG),
-# acting on behalf of its Max Planck Institute for Intelligent Systems and the
-# Max Planck Institute for Biological Cybernetics. All rights reserved.
 import torch
 import torch.nn.functional as F
+from typing import NewType, Union, Optional
+from dataclasses import dataclass, asdict, fields
+import numpy as np
+import torch
+
+Tensor = NewType('Tensor', torch.Tensor)
+Array = NewType('Array', np.ndarray)
+
+
+def to_tensor(
+        array: Union[Array, Tensor], dtype=torch.float32
+) -> Tensor:
+    if torch.is_tensor(array):
+        return array
+    else:
+        return torch.tensor(array, dtype=dtype)
 
 
 def quat_feat(theta):

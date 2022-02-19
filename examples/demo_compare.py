@@ -2,8 +2,8 @@ import numpy as np
 import time
 from torch.autograd import Variable
 import torch
-from smpl2.star import STAR
-from smpl2.smpl2 import SMPL2
+from nosmpl.star import STAR
+from nosmpl.smpl import SMPL2
 
 
 star = STAR(model_path='data/star_1_1/female/model.npz')
