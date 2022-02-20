@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import numpy as np
 import pickle
-from scipy.misc import face
+import os
 
 import torch
 import torch.nn as nn
@@ -14,8 +14,6 @@ from .utils import batch_global_rigid_transformation, batch_rodrigues
 from .lbs import vertices2joints
 from .vertex_joint_selector import VertexJointSelector
 from .vertex_ids import vertex_ids
-from .constants import JOINT_MAP, JOINT_NAMES
-# from .constants import JOINT_MAP, JOINT_NAMES_USED
 
 
 class SMPL(nn.Module):
@@ -80,9 +78,10 @@ class SMPL(nn.Module):
         self.vertex_joint_selector = VertexJointSelector(
             vertex_ids=vertex_ids["smplh"])
 
-        joints = [JOINT_MAP[i] for i in JOINT_NAMES]
-        # TODO: this is fixed for FrankMocap
-        self.joint_map = torch.tensor(joints, dtype=torch.long)
+        # need so this outside SMPL, we just return them all
+        # joints = [JOINT_MAP[i] for i in JOINT_NAMES]
+        # # TODO: this is fixed for FrankMocap
+        # self.joint_map = torch.tensor(joints, dtype=torch.long)
 
     def forward(self, beta, theta, is_axis_angle=False):
         """
@@ -134,8 +133,19 @@ class SMPL(nn.Module):
             joints_extra = vertices2joints(self.extra_regressor, verts)
             joints = torch.cat([joints, joints_extra], dim=1)
             # we might have a mapper for all joints
-            joints = joints[:, self.joint_map, :]
-            return verts, joints
+            # joints = joints[:, self.joint_map, :]
+            return verts, joints, self.faces_tensor
         else:
             # here, returned 24 + 21
-            return verts, joints
+            return verts, joints, self.faces_tensor
+
+
+def export_smpl_to_onnx(smpl_model, save_file, bs=1):
+    os.makedirs(save_file, exist_ok=True)
+    a = torch.rand([bs, 10]).to(device)
+    b = torch.rand([bs, 24, 3, 3]).to(device)
+    torch.onnx.export(smpl_model, (a, b),
+                      save_file,
+                      output_names=['verts', 'joints', 'faces'],
+                      opset_version=12)
+    print('SMPL onnx saved into: ', save_file)
