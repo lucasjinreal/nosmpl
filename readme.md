@@ -11,9 +11,9 @@ However, SMPL codes and models are so messy out there, they have a lot of codes 
 This packages provides:
 
 - [ ] Highly optimized pytorch acceleration with FP16 infer enabled;
-- [ ] Supported ONNX export and infer via ort, so that it might able used into TensorRT or OpenVINO on cpu;
-- [ ] Support STAR, next generation of SMPL.
-- [ ] Provide commonly used geoemtry built-in support without torchgeometry or kornia.
+- [x] Supported ONNX export and infer via ort, so that it might able used into TensorRT or OpenVINO on cpu;
+- [x] Support STAR, next generation of SMPL.
+- [x] Provide commonly used geoemtry built-in support without torchgeometry or kornia.
 
 
 STAR model download from: https://star.is.tue.mpg.de/downloads
@@ -23,7 +23,7 @@ STAR model download from: https://star.is.tue.mpg.de/downloads
 
 Some pipelines build with `nosmpl` support.
 
-
+![](https://s4.ax1x.com/2022/02/20/HLGD00.gif)
 
 ## Copyrights
 
