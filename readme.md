@@ -18,6 +18,22 @@ This packages provides:
 
 STAR model download from: https://star.is.tue.mpg.de/downloads
 
+
+## Updates
+
+- **`2022.03.03`**: I add some `box_transform` code into `nosmpl`, no we can get box_scale info when recover cropped img predicted 3d vertices back to original image. This is helpful when you project 3d vertices back to original image when using `realrender`.
+  the usage like:
+  ```
+  from nosmpl.box_trans import get_box_scale_info, convert_vertices_to_ori_img
+  box_scale_o2n, box_topleft, _ = get_box_scale_info(img, bboxes)
+  frame_verts = convert_vertices_to_ori_img(
+            frame_verts, s, t, box_scale_o2n, box_topleft
+        )
+  ```
+- **`2022.03.05`**: More to go.
+
+
+
 ## Examples
 
 an example to call `nosmlp`:
