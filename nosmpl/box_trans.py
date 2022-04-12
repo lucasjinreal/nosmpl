@@ -86,9 +86,9 @@ def bbox_from_bbr(boxes_cxcywh, rescale=1.2, detection_thresh=0.2, imageHeight=N
 
 
 def get_box_scale_info(img, boxes_cxcywh, input_res=224):
-    '''
+    """
     the boxes format is cxcyhw
-    '''
+    """
     center, scale = bbox_from_bbr(boxes_cxcywh, imageHeight=img.shape[0])
     if center is None:
         return None, None, None, None, None
@@ -104,10 +104,10 @@ def get_box_scale_info(img, boxes_cxcywh, input_res=224):
 def convert_vertices_to_ori_img(
     data3D, scale, trans, box_scale_o2n, box_topleft, bAppTransFirst=False
 ):
-    '''
+    """
     box_scale should calculated from how image cropped.
     and box_topleft is image cropped top left
-    '''
+    """
     data3D = data3D.copy()
     resnet_input_size_half = 224 * 0.5
     if bAppTransFirst:  # Hand model
@@ -127,3 +127,27 @@ def convert_vertices_to_ori_img(
         box_topleft = np.array(box_topleft)
     data3D[:, :2] += box_topleft + resnet_input_size_half / box_scale_o2n
     return data3D
+
+
+def get_bbox_from_keypoints(keyps, scale=1.0):
+    """
+    get bbox of keyps
+    """
+    keyps = keyps.copy()
+    if keyps is None:
+        return
+
+    keyps = keyps[keyps[..., 2] > 0.0]
+    if keyps.shape[-2] < 2:
+        return np.array([0, 0, 0, 0], dtype=np.float32)
+
+    l = min(keyps[..., 0])
+    r = max(keyps[..., 0])
+    u = min(keyps[..., 1])
+    d = max(keyps[..., 1])
+
+    cx = (l + r) / 2.0
+    cy = (u + d) / 2.0
+
+    bboxes = np.stack([l, u, r, d])
+    return bboxes
