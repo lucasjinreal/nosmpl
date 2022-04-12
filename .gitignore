@@ -1,3 +1,4 @@
 *.obj
 *.egg-info/
 build/
+.vscode/
