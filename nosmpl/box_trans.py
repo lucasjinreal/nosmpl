@@ -130,7 +130,7 @@ def convert_vertices_to_ori_img(
     return data3D
 
 
-def get_bbox_from_kps_single(keyps):
+def get_bbox_from_keypoints_single(keyps):
     keyps = keyps.copy()
     if keyps is None:
         return
@@ -153,12 +153,11 @@ def get_bbox_from_kps_single(keyps):
 
 def get_bbox_from_keypoints(keyps, scale=1.0):
     """
-    get bbox of keyps in batched
+    get bbox of keyps
     """
-    # keyps: 101,26,3
-    assert len(keyps.shape) == 3, "this is a batched func, keypoints should like: FxNx3"
+    assert len(keyps.shape) == 3, "keyps must be FxNx3"
     boxes = np.zeros([keyps.shape[0], 4])
     for i in range(keyps.shape[0]):
-        kps = keyps[i]
-        boxes[i] = get_bbox_from_kps_single(kps)
+        b = get_bbox_from_keypoints_single(keyps[i])
+        boxes[i] = b
     return boxes
