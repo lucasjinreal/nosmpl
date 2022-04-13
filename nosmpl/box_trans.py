@@ -4,6 +4,7 @@ and original image.
 
 This is essential but no-one make it clear. I am trying it.
 """
+from matplotlib.pyplot import axis
 import numpy as np
 import cv2
 
@@ -129,25 +130,35 @@ def convert_vertices_to_ori_img(
     return data3D
 
 
-def get_bbox_from_keypoints(keyps, scale=1.0):
-    """
-    get bbox of keyps
-    """
+def get_bbox_from_kps_single(keyps):
     keyps = keyps.copy()
     if keyps is None:
         return
+    if len(keyps.shape) > 2:
+        keyps = keyps[0]
 
-    keyps = keyps[keyps[..., 2] > 0.0]
-    if keyps.shape[-2] < 2:
+    keyps = keyps[keyps[:, 2] > 0.0]
+    if keyps.shape[0] < 2:
         return np.array([0, 0, 0, 0], dtype=np.float32)
 
-    l = min(keyps[..., 0])
-    r = max(keyps[..., 0])
-    u = min(keyps[..., 1])
-    d = max(keyps[..., 1])
+    lb = min(keyps[:, 0])
+    rb = max(keyps[:, 0])
+    ub = min(keyps[:, 1])
+    db = max(keyps[:, 1])
 
-    cx = (l + r) / 2.0
-    cy = (u + d) / 2.0
+    cx = (lb + rb) / 2.0
+    cy = (ub + db) / 2.0
+    return np.array([lb, ub, rb, db], dtype=np.float32)
 
-    bboxes = np.stack([l, u, r, d])
-    return bboxes
+
+def get_bbox_from_keypoints(keyps, scale=1.0):
+    """
+    get bbox of keyps in batched
+    """
+    # keyps: 101,26,3
+    assert len(keyps.shape) == 3, "this is a batched func, keypoints should like: FxNx3"
+    boxes = np.zeros([keyps.shape[0], 4])
+    for i in range(keyps.shape[0]):
+        kps = keyps[i]
+        boxes[i] = get_bbox_from_kps_single(kps)
+    return boxes
