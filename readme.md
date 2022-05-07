@@ -21,6 +21,17 @@ STAR model download from: https://star.is.tue.mpg.de/downloads
 
 ## Updates
 
+
+- **`2022.05.07`**: Added a visualization for Human36m GT, you can using like this to visualize h36m data now:
+  ```
+  import nosmpl.datasets.h36m_data_utils as data_utils
+  from nosmpl.datasets.h36m_vis import h36m_vis_on_gt_file
+  import sys
+
+  if __name__ == "__main__":
+      h36m_vis_on_gt_file(sys.argv[1])
+  ```
+  Just send a h36m txt annotation file, and you can see the animation result. Also, you can using `from nosmpl.datasets.h36m_vis import h36m_load_gt_3d_data` to load 3d data in 3D space.
 - **`2022.03.03`**: I add some `box_transform` code into `nosmpl`, no we can get box_scale info when recover cropped img predicted 3d vertices back to original image. This is helpful when you project 3d vertices back to original image when using `realrender`.
   the usage like:
   ```
