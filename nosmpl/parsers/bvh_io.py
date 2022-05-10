@@ -11,6 +11,8 @@ import numpy as np
 from ..geometries.quaternion import Quaternions
 import torch
 from ..geometry import quat2euler, quat2repr6d, repr6d2quat
+from alfred import logger
+
 
 channelmap = {"Xrotation": "x", "Yrotation": "y", "Zrotation": "z"}
 
@@ -384,6 +386,11 @@ def save_joint(f, anim, names, t, i, order="zyx", positions=False):
 
 # rotation with shape frame * J * 3
 def write_bvh(parent, offset, rotation, position, names, frametime, order, path, endsite=None):
+    logger.info('start write BVH file:')
+    logger.info(f'names: {names}')
+    logger.info(f'frametime: {frametime}')
+    logger.info(f'path: {path}')
+
     file = open(path, 'w')
     frame = rotation.shape[0]
     joint_num = rotation.shape[1]

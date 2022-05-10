@@ -307,27 +307,27 @@ def quat2repr6d(quat):
 
 
 def mat2quat(R) -> torch.Tensor:
-    '''
+    """
     https://github.com/duolu/pyrotation/blob/master/pyrotation/pyrotation.py
     Convert a rotation matrix to a unit quaternion.
 
     This uses the Shepperd’s method for numerical stability.
-    '''
+    """
 
     # The rotation matrix must be orthonormal
 
-    w2 = (1 + R[..., 0, 0] + R[..., 1, 1] + R[..., 2, 2])
-    x2 = (1 + R[..., 0, 0] - R[..., 1, 1] - R[..., 2, 2])
-    y2 = (1 - R[..., 0, 0] + R[..., 1, 1] - R[..., 2, 2])
-    z2 = (1 - R[..., 0, 0] - R[..., 1, 1] + R[..., 2, 2])
+    w2 = 1 + R[..., 0, 0] + R[..., 1, 1] + R[..., 2, 2]
+    x2 = 1 + R[..., 0, 0] - R[..., 1, 1] - R[..., 2, 2]
+    y2 = 1 - R[..., 0, 0] + R[..., 1, 1] - R[..., 2, 2]
+    z2 = 1 - R[..., 0, 0] - R[..., 1, 1] + R[..., 2, 2]
 
-    yz = (R[..., 1, 2] + R[..., 2, 1])
-    xz = (R[..., 2, 0] + R[..., 0, 2])
-    xy = (R[..., 0, 1] + R[..., 1, 0])
+    yz = R[..., 1, 2] + R[..., 2, 1]
+    xz = R[..., 2, 0] + R[..., 0, 2]
+    xy = R[..., 0, 1] + R[..., 1, 0]
 
-    wx = (R[..., 2, 1] - R[..., 1, 2])
-    wy = (R[..., 0, 2] - R[..., 2, 0])
-    wz = (R[..., 1, 0] - R[..., 0, 1])
+    wx = R[..., 2, 1] - R[..., 1, 2]
+    wy = R[..., 0, 2] - R[..., 2, 0]
+    wz = R[..., 1, 0] - R[..., 0, 1]
 
     w = torch.empty_like(x2)
     x = torch.empty_like(x2)
@@ -364,6 +364,7 @@ def mat2quat(R) -> torch.Tensor:
 
     return torch.cat(res, dim=-1) / 2
 
+
 def repr6d2quat(repr) -> torch.Tensor:
     x = repr[..., :3]
     y = repr[..., 3:]
@@ -375,3 +376,70 @@ def repr6d2quat(repr) -> torch.Tensor:
     res = [v.unsqueeze(-2) for v in res]
     mat = torch.cat(res, dim=-2)
     return mat2quat(mat)
+
+
+def repr6d2mat(repr):
+    x = repr[..., :3]
+    y = repr[..., 3:]
+    x = x / x.norm(dim=-1, keepdim=True)
+    z = torch.cross(x, y)
+    z = z / z.norm(dim=-1, keepdim=True)
+    y = torch.cross(z, x)
+    res = [x, y, z]
+    res = [v.unsqueeze(-2) for v in res]
+    mat = torch.cat(res, dim=-2)
+    return mat
+
+
+def euler2mat(rots, order="xyz"):
+    axis = {
+        "x": torch.tensor((1, 0, 0), device=rots.device),
+        "y": torch.tensor((0, 1, 0), device=rots.device),
+        "z": torch.tensor((0, 0, 1), device=rots.device),
+    }
+
+    rots = rots / 180 * np.pi
+    mats = []
+    for i in range(3):
+        aa = axis[order[i]] * rots[..., i].unsqueeze(-1)
+        mats.append(aa2mat(aa))
+    return mats[0] @ (mats[1] @ mats[2])
+
+
+def aa2mat(rots):
+    """
+    Convert angle-axis representation to rotation matrix
+    :param rots: angle-axis representation
+    :return:
+    """
+    quat = aa2quat(rots)
+    mat = quat2mat(quat)
+    return mat
+
+
+def aa2quat(rots, form="wxyz", unified_orient=True):
+    """
+    Convert angle-axis representation to wxyz quaternion and to the half plan (w >= 0)
+    @param rots: angle-axis rotations, (*, 3)
+    @param form: quaternion format, either 'wxyz' or 'xyzw'
+    @param unified_orient: Use unified orientation for quaternion (quaternion is dual cover of SO3)
+    :return:
+    """
+    angles = rots.norm(dim=-1, keepdim=True)
+    norm = angles.clone()
+    norm[norm < 1e-8] = 1
+    axis = rots / norm
+    quats = torch.empty(rots.shape[:-1] + (4,), device=rots.device, dtype=rots.dtype)
+    angles = angles * 0.5
+    if form == "wxyz":
+        quats[..., 0] = torch.cos(angles.squeeze(-1))
+        quats[..., 1:] = torch.sin(angles) * axis
+    elif form == "xyzw":
+        quats[..., :3] = torch.sin(angles) * axis
+        quats[..., 3] = torch.cos(angles.squeeze(-1))
+
+    if unified_orient:
+        idx = quats[..., 0] < 0
+        quats[idx, :] *= -1
+
+    return quats

@@ -3,10 +3,11 @@ from . import bvh_io as bvh_io
 import numpy as np
 from ..geometries.quaternion import Quaternions
 
-# from bvh.skeleton_database import SkeletonDatabase
+from .skeleton_presets import SkeletonPresets
 from ..kinematics import ForwardKinematicsJoint
 from ..geometry import quat2repr6d, quat2mat
 from .bvh_io import WriterWrapper
+from alfred import logger
 
 
 def velocity(pos, padding=False):
@@ -35,16 +36,19 @@ class Skeleton:
         self._parent = None
         self._ee_id = None
         self.contact_names = []
+        self.prefix = ""
 
         for i, name in enumerate(self._names):
             if ":" in name:
-                self._names[i] = name[name.find(":") + 1 :]
+                self._names[i] = name.split(":")[-1]
+                p = name.split(":")[0]
+                self.prefix = p
 
         if joint_reduction:
-            self.skeleton_type, match_num = SkeletonDatabase.match(names)
-            corps_names = SkeletonDatabase.corps_names[self.skeleton_type]
-            self.contact_names = SkeletonDatabase.contact_names[self.skeleton_type]
-            self.contact_threshold = SkeletonDatabase.contact_thresholds[
+            self.skeleton_type, match_num = SkeletonPresets.match(names)
+            corps_names = SkeletonPresets.corps_names[self.skeleton_type]
+            self.contact_names = SkeletonPresets.contact_names[self.skeleton_type]
+            self.contact_threshold = SkeletonPresets.contact_thresholds[
                 self.skeleton_type
             ]
 
@@ -108,6 +112,16 @@ class Skeleton:
         return self.simplified_name
 
     @property
+    def names_full(self):
+        # for mixamo only
+        return [self.prefix + ":" + i for i in self.simplified_name]
+    
+    @property
+    def names_mixamo(self):
+        # for mixamo only
+        return ["mixamorig:" + i for i in self.simplified_name]
+
+    @property
     def ee_id(self):
         raise Exception("Abaddoned")
         # if self._ee_id is None:
@@ -120,8 +134,15 @@ class BVH_file:
     def __init__(
         self, file_path, no_scale=False, requires_contact=False, joint_reduction=True
     ):
+        """
+        if joint reduction, we only using a subset from the original BVH
+        """
+        logger.info(
+            f"Loading BVH file: {file_path}, joint_subsampling: {joint_reduction}"
+        )
         self.anim = bvh_io.load(file_path)
         self._names = self.anim.names
+        print(self._names)
         self.frametime = self.anim.frametime
         self.skeleton = Skeleton(
             self.anim.names, self.anim.parent, self.anim.offsets, joint_reduction
