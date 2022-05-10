@@ -21,7 +21,19 @@ STAR model download from: https://star.is.tue.mpg.de/downloads
 
 ## Updates
 
+- **`2022.05.10`**: Add BHV reader, you can now read and write bvh file:
+  ```python
+  from nosmpl.parsers import bvh_io
+  import sys
 
+
+  animation = bvh_io.load(sys.argv[1])
+  print(animation.names)
+  print(animation.frametime)
+  print(animation.parent)
+  print(animation.offsets)
+  print(animation.shape)
+  ```
 - **`2022.05.07`**: Added a visualization for Human36m GT, you can using like this to visualize h36m data now:
   ```
   import nosmpl.datasets.h36m_data_utils as data_utils
