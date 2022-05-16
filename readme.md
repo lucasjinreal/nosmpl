@@ -21,6 +21,12 @@ STAR model download from: https://star.is.tue.mpg.de/downloads
 
 ## Updates
 
+- **`2022.05.16`**: Now added `human_prior` inside `nosmpl`, you don't need install that lib anymore, or install torchgeometry either:
+  ```python
+  from nosmpl.vpose.tools.model_loader import load_vposer
+  self.vposer, _ = load_vposer(VPOSER_PATH, vp_model="snapshot")
+  ```
+  then you can load vpose to use.
 - **`2022.05.10`**: Add BHV reader, you can now read and write bvh file:
   ```python
   from nosmpl.parsers import bvh_io
