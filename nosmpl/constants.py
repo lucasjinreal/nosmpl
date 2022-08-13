@@ -42,3 +42,14 @@ JOINT_MAP = {
     'Head (H36M)': 53, 'Nose': 24, 'Left Eye': 26,
     'Right Eye': 25, 'Left Ear': 28, 'Right Ear': 27
 }
+
+JOINT_NAMES_OPENPOSE25_ONLY_MAP = {
+    'OP Nose': 24, 'OP Neck': 12, 'OP RShoulder': 17,
+    'OP RElbow': 19, 'OP RWrist': 21, 'OP LShoulder': 16,
+    'OP LElbow': 18, 'OP LWrist': 20, 'OP MidHip': 0,
+    'OP RHip': 2, 'OP RKnee': 5, 'OP RAnkle': 8,
+    'OP LHip': 1, 'OP LKnee': 4, 'OP LAnkle': 7,
+    'OP REye': 25, 'OP LEye': 26, 'OP REar': 27,
+    'OP LEar': 28, 'OP LBigToe': 29, 'OP LSmallToe': 30,
+    'OP LHeel': 31, 'OP RBigToe': 32, 'OP RSmallToe': 33, 'OP RHeel': 34,
+}
