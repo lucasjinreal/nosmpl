@@ -7,7 +7,7 @@ REQUIREMENTS = ["numpy", "opencv-python", "alfred-py"]
 
 setuptools.setup(
      name='nosmpl',  
-     version='0.0.3',
+     version='0.0.4',
      author="Lucas Jin",
      author_email="11@qq.com",
      install_requires=REQUIREMENTS,
