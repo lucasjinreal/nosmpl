@@ -1,10 +1,6 @@
-from re import A
 import numpy as np
 import os
 import sys
-from nosmpl.constants import get_j_regressor_h36m
-from nosmpl.ik.simple_ik import simple_ik_solver
-
 import torch
 import smplx
 from nosmpl.vis.vis_o3d import vis_mesh_o3d

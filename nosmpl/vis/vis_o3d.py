@@ -24,7 +24,6 @@ def create_mesh(vertices, faces, colors=None, **kwargs):
         mesh.vertex_colors = Vector3dVector(colors)
     else:
         r_c = np.random.random(3)
-        print(r_c)
         mesh.paint_uniform_color(r_c)
     return mesh
 
