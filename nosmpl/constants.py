@@ -1,3 +1,7 @@
+import os
+import numpy as np
+
+
 JOINT_NAMES = [
     'OP Nose', 'OP Neck', 'OP RShoulder',  # 0,1,2
     'OP RElbow', 'OP RWrist', 'OP LShoulder',  # 3,4,5
@@ -53,3 +57,10 @@ JOINT_NAMES_OPENPOSE25_ONLY_MAP = {
     'OP LEar': 28, 'OP LBigToe': 29, 'OP LSmallToe': 30,
     'OP LHeel': 31, 'OP RBigToe': 32, 'OP RSmallToe': 33, 'OP RHeel': 34,
 }
+
+
+def get_j_regressor_h36m():
+    f = os.path.join(os.path.dirname(__file__), 'data/J_regressor_h36m.npy')
+    assert os.path.exists(f), 'can not found J_regressor_h36m.npy'
+    a = np.load(f)
+    return a
