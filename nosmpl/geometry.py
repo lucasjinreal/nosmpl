@@ -1,4 +1,7 @@
-import torch
+try:
+    import torch
+except ImportError:
+    print('pytorch not installed!')
 import numpy as np
 
 
