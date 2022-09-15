@@ -420,7 +420,7 @@ def aa2mat(rots):
     return mat
 
 
-def aa2quat(rots, form="xyzw", unified_orient=True, return_np=True):
+def aa2quat(rots, form="wxyz", unified_orient=True, return_np=True):
     """
     Convert angle-axis representation to wxyz quaternion and to the half plan (w >= 0)
     @param rots: angle-axis rotations, (*, 3)
