@@ -1,2 +1,3 @@
 include LICENSE
 include readme.md
+include nosmpl/data/J_regressor_h36m.npy
