@@ -36,6 +36,7 @@ if __name__ == '__main__':
     if bpy is None:
         np.random.seed(21023)
         a = np.random.rand(24, 3, 3)
+        a, _ = np.linalg.qr(a)
         aa = R.from_matrix(a)
 
         aaa = aa.as_quat()
@@ -52,6 +53,7 @@ if __name__ == '__main__':
         print('runing bpy')
         np.random.seed(21023)
         a = np.random.rand(24, 3, 3)
+        a, _ = np.linalg.qr(a)
         # pose = rotation_matrix_to_angle_axis(a)
         mat_rots = a
 
