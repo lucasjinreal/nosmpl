@@ -417,7 +417,7 @@ def aa2mat(rots):
     return mat
 
 
-def aa2quat(rots, form="wxyz", unified_orient=True):
+def aa2quat(rots, form="xyzw", unified_orient=True, return_np=True):
     """
     Convert angle-axis representation to wxyz quaternion and to the half plan (w >= 0)
     @param rots: angle-axis rotations, (*, 3)
@@ -425,6 +425,8 @@ def aa2quat(rots, form="wxyz", unified_orient=True):
     @param unified_orient: Use unified orientation for quaternion (quaternion is dual cover of SO3)
     :return:
     """
+    if isinstance(rots, np.ndarray):
+        rots = torch.as_tensor(rots)
     angles = rots.norm(dim=-1, keepdim=True)
     norm = angles.clone()
     norm[norm < 1e-8] = 1
@@ -441,5 +443,6 @@ def aa2quat(rots, form="wxyz", unified_orient=True):
     if unified_orient:
         idx = quats[..., 0] < 0
         quats[idx, :] *= -1
-
+    if return_np:
+        return quats.cpu().numpy()
     return quats
