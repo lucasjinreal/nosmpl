@@ -99,6 +99,13 @@ The output shape of onnx model like:
 ```
 
 
+## Notes
+
+1. About quaternion
+
+the `aa2quat` function, will converts quaternion in `wxyz` as default order. This is **different** from scipy. It's consistent as mostly 3d software such as Blender or UE.
+
+
 ## Results
 
 Some pipelines build with `nosmpl` support.
