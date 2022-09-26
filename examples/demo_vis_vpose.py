@@ -5,7 +5,10 @@ import torch
 import smplx
 from nosmpl.vis.vis_o3d import vis_mesh_o3d
 from alfred import print_shape
-from human_body_prior.body_model.body_model import BodyModel
+from vpose.tools.model_loader import load_vposer
+
+from os import path as osp
+
 
 model_type = "smplx"
 
@@ -23,25 +26,16 @@ elif model_type == "smplx":
         model_type="smplx",
     )
 
-from human_body_prior.tools.model_loader import load_model
-from human_body_prior.models.vposer_model import VPoser
-from os import path as osp
 
-support_dir = "../support_data/dowloads"
-expr_dir = osp.join(support_dir, "vposer_v2_05")
-vp, ps = load_model(
-    expr_dir,
-    model_code=VPoser,
-    remove_words_in_model_weights="vp_model.",
-    disable_grad=True,
-)
-vp = vp.to("cuda")
+
+VPOSER_PATH = 'data/vposer_v1_0'
+vp, _ = load_vposer(VPOSER_PATH, vp_model="snapshot")
 
 num_poses = 9  # number of body poses in each batch
 
-sampled_pose_body = (
-    vp.sample_poses(num_poses=num_poses)["pose_body"].contiguous().view(num_poses, -1)
-)
+
+sampled_pose_body = vp.sample_poses(num_poses=num_poses)
+print_shape(sampled_pose_body)
 
 
 if model_type == "smpl":
@@ -62,13 +56,16 @@ elif model_type == "smplx":
         [1, model.num_expression_coeffs], dtype=torch.float32
     ).clamp(0, 0.1)
     body_pose = torch.randn([1, 21, 3], dtype=torch.float32).clamp(0, 0.4)
-    output = model(
-        betas=betas, expression=expression, body_pose=body_pose, return_verts=True
-    )
+    
+    for i in range(num_poses):
+        body_pose = sampled_pose_body[i]
+        output = model(
+            betas=betas, expression=expression, body_pose=body_pose, return_verts=True
+        )
 
 
-vertices = output.vertices[0].detach().cpu().numpy().squeeze()
-joints = output.joints[0].detach().cpu().numpy().squeeze()
+        vertices = output.vertices[0].detach().cpu().numpy().squeeze()
+        joints = output.joints[0].detach().cpu().numpy().squeeze()
 
-faces = model.faces.astype(np.int32)
-vis_mesh_o3d(vertices, faces)
+        faces = model.faces.astype(np.int32)
+        vis_mesh_o3d(vertices, faces)
