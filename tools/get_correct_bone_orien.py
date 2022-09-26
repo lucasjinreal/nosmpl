@@ -82,7 +82,14 @@ def find_correction_matrix_recursive(bone, parent_correction_inv=None):
     for child in bone.children:
         # child is bone
         find_correction_matrix_recursive(child, correction_matrix_inv)
-        
+
+
+def get_bone_orientation(bone):
+    '''
+    get bone orient
+    '''
+    pass
+    
 
 bones = bpy.data.objects['Armature.003'].data.bones
 
