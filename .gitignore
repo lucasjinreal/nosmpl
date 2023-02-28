@@ -6,3 +6,5 @@ dist/
 *.pyc
 vendor/
 vendor/
+*.onnx
+*.json

@@ -4,9 +4,10 @@ import sys
 import torch
 import smplx
 from nosmpl.vis.vis_o3d import vis_mesh_o3d
-from alfred import print_shape
+from alfred import print_shape, logger
+from nosmpl.body_models import SMPLH
 
-model_type = "smplx"
+model_type = "smplh"
 
 if model_type == "smpl":
     model = smplx.create(
@@ -21,7 +22,17 @@ elif model_type == "smplx":
         os.path.expanduser("~/data/face_and_pose/smplx/SMPLX_FEMALE.npz"),
         model_type="smplx",
     )
+elif model_type == "smplh":
+    # model = smplx.create(
+    #     os.path.expanduser("E:\\SMPLs\\SMPLH_converted\\SMPLH_female.pkl"),
+    #     model_type="smplx",
+    # )
+    model = SMPLH(
+        os.path.expanduser("E:\\SMPLs\\SMPLH_converted\\SMPLH_female.pkl"),
+        use_pca=False,
+    )
 
+num_poses = 4
 
 if model_type == "smpl":
     betas = torch.randn([1, model.num_betas], dtype=torch.float32)
@@ -35,17 +46,75 @@ if model_type == "smpl":
         global_orient=global_orient,
         return_verts=True,
     )
+
+    vertices = output.vertices[0].detach().cpu().numpy().squeeze()
+    joints = output.joints[0].detach().cpu().numpy().squeeze()
+
+    faces = model.faces.astype(np.int32)
+    vis_mesh_o3d(vertices, faces)
+
 elif model_type == "smplx":
     betas = torch.randn([1, model.num_betas], dtype=torch.float32).clamp(0, 0.1)
-    expression = torch.randn([1, model.num_expression_coeffs], dtype=torch.float32).clamp(0, 0.1)
+    expression = torch.randn(
+        [1, model.num_expression_coeffs], dtype=torch.float32
+    ).clamp(0, 0.1)
     body_pose = torch.randn([1, 21, 3], dtype=torch.float32).clamp(0, 0.4)
     output = model(
         betas=betas, expression=expression, body_pose=body_pose, return_verts=True
     )
 
+    vertices = output.vertices[0].detach().cpu().numpy().squeeze()
+    joints = output.joints[0].detach().cpu().numpy().squeeze()
 
-vertices = output.vertices[0].detach().cpu().numpy().squeeze()
-joints = output.joints[0].detach().cpu().numpy().squeeze()
+    faces = model.faces.astype(np.int32)
+    vis_mesh_o3d(vertices, faces)
 
-faces = model.faces.astype(np.int32)
-vis_mesh_o3d(vertices, faces)
+elif model_type == "smplh":
+    betas = torch.randn([1, model.num_betas], dtype=torch.float32).clamp(0, 0.1)
+    expression = torch.randn(
+        [1, model.num_expression_coeffs], dtype=torch.float32
+    ).clamp(0, 0.1)
+
+    logger.info(f"betas: {model.num_betas}, expressions: {model.num_expression_coeffs}")
+
+    body_pose = torch.randn([1, 63], dtype=torch.float32).clamp(0, 0.4)
+    left_hand_pose = torch.randn([1, 45], dtype=torch.float32).clamp(0, 0.4)
+    right_hand_pose = torch.randn([1, 45], dtype=torch.float32).clamp(0, 0.4)
+    output = model(
+        betas=betas,
+        # expression=expression,
+        body_pose=body_pose,
+        left_hand_pose=left_hand_pose,
+        right_hand_pose=right_hand_pose,
+        # global_orient=global_orient,
+        return_verts=True,
+    )
+    print(output[0].shape)
+
+    torch.onnx.export(
+        model,
+        (None, None, body_pose, left_hand_pose, right_hand_pose),
+        "smplh.onnx",
+        input_names=["body", "lhand", "rhand"],
+        output_names=["vertices", "joints", "faces"],
+    )
+    logger.info("exported smplh to onnx.")
+
+    for i in range(num_poses):
+        body_pose = torch.randn([1, 63], dtype=torch.float32).clamp(0, 0.4)
+        global_orient = torch.randn([1, 3], dtype=torch.float32)
+        print_shape(body_pose, global_orient)
+        output = model(
+            betas=betas,
+            # expression=expression,
+            body_pose=body_pose,
+            # global_orient=global_orient,
+            return_verts=True,
+        )
+
+        vertices, joints = output
+        vertices = vertices[0].detach().cpu().numpy().squeeze()
+        joints = joints[0].detach().cpu().numpy().squeeze()
+
+        faces = model.faces.astype(np.int32)
+        vis_mesh_o3d(vertices, faces)

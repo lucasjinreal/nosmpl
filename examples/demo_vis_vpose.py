@@ -4,13 +4,11 @@ import sys
 import torch
 import smplx
 from nosmpl.vis.vis_o3d import vis_mesh_o3d
-from alfred import print_shape
-from vpose.tools.model_loader import load_vposer
-
+from alfred import print_shape, logger
 from os import path as osp
 
 
-model_type = "smplx"
+model_type = "smplh"
 
 if model_type == "smpl":
     model = smplx.create(
@@ -25,17 +23,14 @@ elif model_type == "smplx":
         os.path.expanduser("~/data/face_and_pose/smplx/SMPLX_FEMALE.npz"),
         model_type="smplx",
     )
+elif model_type == "smplh":
+    model = smplx.create(
+        os.path.expanduser("E:\\SMPLs\\SMPLH\\SMPLH_female.pkl"),
+        model_type="smplx",
+    )
 
 
-
-VPOSER_PATH = 'data/vposer_v1_0'
-vp, _ = load_vposer(VPOSER_PATH, vp_model="snapshot")
-
-num_poses = 9  # number of body poses in each batch
-
-
-sampled_pose_body = vp.sample_poses(num_poses=num_poses)
-print_shape(sampled_pose_body)
+num_poses = 4  # number of body poses in each batch
 
 
 if model_type == "smpl":
@@ -56,13 +51,32 @@ elif model_type == "smplx":
         [1, model.num_expression_coeffs], dtype=torch.float32
     ).clamp(0, 0.1)
     body_pose = torch.randn([1, 21, 3], dtype=torch.float32).clamp(0, 0.4)
-    
+
     for i in range(num_poses):
-        body_pose = sampled_pose_body[i]
+        body_pose = None
         output = model(
             betas=betas, expression=expression, body_pose=body_pose, return_verts=True
         )
 
+        vertices = output.vertices[0].detach().cpu().numpy().squeeze()
+        joints = output.joints[0].detach().cpu().numpy().squeeze()
+
+        faces = model.faces.astype(np.int32)
+        vis_mesh_o3d(vertices, faces)
+
+elif model_type == "smplh":
+    betas = torch.randn([1, model.num_betas], dtype=torch.float32).clamp(0, 0.1)
+    expression = torch.randn(
+        [1, model.num_expression_coeffs], dtype=torch.float32
+    ).clamp(0, 0.1)
+    body_pose = torch.randn([1, 21, 3], dtype=torch.float32).clamp(0, 0.4)
+    logger.info(f'betas: {model.num_betas}, expressions: {model.num_expression_coeffs}')
+
+    for i in range(num_poses):
+        body_pose = None
+        output = model(
+            betas=betas, expression=expression, body_pose=body_pose, return_verts=True
+        )
 
         vertices = output.vertices[0].detach().cpu().numpy().squeeze()
         joints = output.joints[0].detach().cpu().numpy().squeeze()
