@@ -15,6 +15,7 @@ from nosmpl.vis.vis_o3d import vis_mesh_o3d, Open3DVisualizer
 import json
 from alfred import print_shape
 from nosmpl.utils import rot_mat_to_euler
+import sys
 
 
 def gen():
@@ -44,9 +45,11 @@ def gen():
 
 
 def vis_json():
+    model_f = sys.argv[1]
     sess = rt.InferenceSession("smplh_sim.onnx")
 
-    data = json.load(open("test.json", "r"))
+    data_f = sys.argv[1]
+    data = json.load(open(data_f, "r"))
     data = dict((int(key), value) for (key, value) in data.items())
     data = collections.OrderedDict(sorted(data.items()))
     ks = list(data.keys())

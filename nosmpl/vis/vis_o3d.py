@@ -67,7 +67,7 @@ class Open3DVisualizer:
 
         self.save_img_folder = save_img_folder
         if save_img_folder:
-            os.makedirs(self.save_img_folder)
+            os.makedirs(self.save_img_folder, exist_ok=True)
 
     def update(self, vertices, faces, trans=None):
         mesh = create_mesh(
