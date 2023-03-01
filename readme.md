@@ -109,6 +109,10 @@ if __name__ == "__main__":
     gen()
 ```
 
+You will see a mesh with your pose, generated:
+
+![](https://s1.ax1x.com/2023/03/01/ppim6EV.png)
+
 As you can see, we are using a single ONNX model, by some randome poses, you can generated a visualized mesh.
 
 **this is useful when you wanna test your predict pose is right or not!**
