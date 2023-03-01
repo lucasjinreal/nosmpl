@@ -15,7 +15,7 @@ This packages provides:
 - [x] Support STAR, next generation of SMPL.
 - [x] Provide commonly used geoemtry built-in support without torchgeometry or kornia.
 
-STAR model download from: https://star.is.tue.mpg.de/downloads
+STAR model download from: https://star.is.tue.mpg.de
 
 ## Updates
 
