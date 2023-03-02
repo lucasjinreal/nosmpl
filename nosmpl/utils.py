@@ -4,6 +4,7 @@ from typing import NewType, Union, Optional
 from dataclasses import dataclass, asdict, fields
 import numpy as np
 import torch
+from scipy.spatial.transform import Rotation as R
 
 Tensor = NewType("Tensor", torch.Tensor)
 Array = NewType("Array", np.ndarray)
@@ -48,20 +49,39 @@ def rot_mat_to_euler(rot_mats):
         return torch.atan2(-rot_mats[:, 2, 0], sy)
     else:
         assert len(rot_mats.shape) == 2, "numpy mode support only 3x3"
-        # sy = np.sqrt(
-        #     rot_mats[0, 0] * rot_mats[0, 0] + rot_mats[1, 0] * rot_mats[1, 0]
+
+        # r = R.from_matrix(rot_mats)
+        # res = r.as_euler('xyz', degrees=False)
+        # return res
+
+        # res = np.array(
+        #     [
+        #         np.arctan2(rot_mats[2, 1], rot_mats[2, 2]),
+        #         np.arctan2(
+        #             -rot_mats[2, 0], np.sqrt(rot_mats[2, 1] ** 2 + rot_mats[2, 2] ** 2)
+        #         ),
+        #         np.arctan2(rot_mats[1, 0], rot_mats[0, 0]),
+        #     ]
         # )
-        # return np.arctan2(-rot_mats[2, 0], sy)
-        res = np.array(
-            [
-                np.arctan2(rot_mats[2, 1], rot_mats[2, 2]),
-                np.arctan2(
-                    -rot_mats[2, 0], np.sqrt(rot_mats[2, 1] ** 2 + rot_mats[2, 2] ** 2)
-                ),
-                np.arctan2(rot_mats[1, 0], rot_mats[0, 0]),
-            ]
-        )
-        return res
+        R = rot_mats
+        sy = np.sqrt(R[0, 0] * R[0, 0] + R[1, 0] * R[1, 0])
+        singular = sy < 1e-6
+        if not singular:
+            x = np.arctan2(R[2, 1], R[2, 2])
+            y = np.arctan2(-R[2, 0], sy)
+            z = np.arctan2(R[1, 0], R[0, 0])
+        else:
+            x = np.arctan2(-R[1, 2], R[1, 1])
+            y = np.arctan2(-R[2, 0], sy)
+            z = 0
+        return np.array([x, y, z])
+
+
+def rotmat_to_rotvec(rot_mats):
+    assert isinstance(rot_mats, np.ndarray), "only accept numpy for now"
+    r = R.from_matrix(rot_mats)
+    res = r.as_rotvec()
+    return res
 
 
 def quat_feat(theta):

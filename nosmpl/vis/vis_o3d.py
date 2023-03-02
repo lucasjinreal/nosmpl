@@ -69,7 +69,7 @@ class Open3DVisualizer:
         if save_img_folder:
             os.makedirs(self.save_img_folder, exist_ok=True)
 
-    def update(self, vertices, faces, trans=None):
+    def update(self, vertices, faces, trans=None, R_along_axis=(0, 0, 0), waitKey=1):
         mesh = create_mesh(
             vertices, faces, colors=[82.0 / 255, 217.0 / 255, 118.0 / 255]
         )
@@ -79,17 +79,30 @@ class Open3DVisualizer:
         # min_y = -mesh.get_min_bound()[1]
         # mesh.translate([0, min_y, 0])
 
+        R = mesh.get_rotation_matrix_from_xyz(R_along_axis)
+        mesh.rotate(R, center=(0, 0, 0))
+
         if trans:
             mesh.translate(trans)
 
-        self.vis.clear_geometries()
-        self.vis.add_geometry(mesh)
-        # self.vis.update_geometry(mesh)
-        self.vis.poll_events()
-        self.vis.update_renderer()
-        if self.save_img_folder:
-            self.vis.capture_screen_image(
-                os.path.join(self.save_img_folder, "temp_%04d.png" % self.idx)
-            )
-        self.idx += 1
-        time.sleep(1/self.fps)
+        if waitKey == 0:
+            self.vis.clear_geometries()
+            self.vis.add_geometry(mesh)
+            self.vis.run()
+        else:
+            self.vis.clear_geometries()
+            self.vis.add_geometry(mesh)
+            # self.vis.update_geometry(mesh)
+            self.vis.poll_events()
+            self.vis.update_renderer()
+            if self.save_img_folder:
+                self.vis.capture_screen_image(
+                    os.path.join(self.save_img_folder, "temp_%04d.png" % self.idx)
+                )
+            self.idx += 1
+            time.sleep(1 / self.fps)
+    
+    def release(self):
+        self.vis.destroy_window()
+
+

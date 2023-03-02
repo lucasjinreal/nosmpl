@@ -77,6 +77,7 @@ elif model_type == "smplh":
 
     logger.info(f"betas: {model.num_betas}, expressions: {model.num_expression_coeffs}")
 
+    global_orient = torch.randn([1, 3], dtype=torch.float32).clamp(0, 0.4)
     body_pose = torch.randn([1, 63], dtype=torch.float32).clamp(0, 0.4)
     left_hand_pose = torch.randn([1, 45], dtype=torch.float32).clamp(0, 0.4)
     right_hand_pose = torch.randn([1, 45], dtype=torch.float32).clamp(0, 0.4)
@@ -86,16 +87,16 @@ elif model_type == "smplh":
         body_pose=body_pose,
         left_hand_pose=left_hand_pose,
         right_hand_pose=right_hand_pose,
-        # global_orient=global_orient,
+        global_orient=global_orient,
         return_verts=True,
     )
     print(output[0].shape)
 
     torch.onnx.export(
         model,
-        (None, None, body_pose, left_hand_pose, right_hand_pose),
+        (None, global_orient, body_pose, left_hand_pose, right_hand_pose),
         "smplh.onnx",
-        input_names=["body", "lhand", "rhand"],
+        input_names=["global_orient", "body", "lhand", "rhand"],
         output_names=["vertices", "joints", "faces"],
     )
     logger.info("exported smplh to onnx.")

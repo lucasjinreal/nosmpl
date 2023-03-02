@@ -14,7 +14,7 @@ import numpy as np
 from nosmpl.vis.vis_o3d import vis_mesh_o3d, Open3DVisualizer
 import json
 from alfred import print_shape
-from nosmpl.utils import rot_mat_to_euler
+from nosmpl.utils import rot_mat_to_euler, rotmat_to_rotvec
 import sys
 
 
@@ -46,7 +46,7 @@ def gen():
 
 def vis_json():
     model_f = sys.argv[1]
-    sess = rt.InferenceSession("smplh_sim.onnx")
+    sess = rt.InferenceSession("smplh_sim_w_orien.onnx")
 
     data_f = sys.argv[1]
     data = json.load(open(data_f, "r"))
@@ -65,17 +65,28 @@ def vis_json():
 
         trans = data_frame["trans"]
 
-        pose_euler = [rot_mat_to_euler(i) for i in pose]
-        pose_euler = np.array(pose_euler).reshape(1, 156)
-        print(pose_euler.shape)
+        pose_rotvec = [rotmat_to_rotvec(i) for i in pose]
+        pose_rotvec = np.array(pose_rotvec).reshape(1, 156)
+        print(pose_rotvec.shape)
 
-        body = pose_euler[:, 3:66].astype(np.float32)
-        lhand = pose_euler[:, 66:111].astype(np.float32)
-        rhand = pose_euler[:, 111:].astype(np.float32)
+        global_orient = pose_rotvec[:, :3].astype(np.float32)
+        # global_orient = [[i[0], -i[1], i[2]] for i in global_orient]
+        # global_orient = np.array(global_orient).astype(np.float32)
+        body = pose_rotvec[:, 3:66].astype(np.float32)
+        lhand = pose_rotvec[:, 66:111].astype(np.float32)
+        rhand = pose_rotvec[:, 111:].astype(np.float32)
 
         print_shape(body, lhand, rhand)
 
-        outputs = sess.run(None, {"body": body, "lhand": lhand, "rhand": rhand})
+        outputs = sess.run(
+            None,
+            {
+                "global_orient": global_orient,
+                "body": body,
+                "lhand": lhand,
+                "rhand": rhand,
+            },
+        )
 
         vertices, joints, faces = outputs
         vertices = vertices[0].squeeze()
@@ -87,8 +98,8 @@ def vis_json():
         # trans = [trans[1], trans[0], trans[2]]
         trans = [trans[0], trans[1], 0]
         print(trans)
-        o3d_vis.update(vertices, faces, trans)
-
+        o3d_vis.update(vertices, faces, trans, R_along_axis=[np.pi, 0, 0], waitKey=0)
+    o3d_vis.release()
 
 if __name__ == "__main__":
     # gen()
