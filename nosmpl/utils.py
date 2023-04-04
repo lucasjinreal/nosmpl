@@ -84,6 +84,10 @@ def rotmat_to_rotvec(rot_mats):
     return res
 
 
+def quat_to_rotvec(quat):
+    r = R.from_quat(quat)
+    return r.as_rotvec()
+
 def quat_feat(theta):
     """
         Computes a normalized quaternion ([0,0,0,0]  when the body is in rest pose)

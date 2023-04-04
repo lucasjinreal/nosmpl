@@ -5,14 +5,21 @@ import torch
 import smplx
 from nosmpl.vis.vis_o3d import vis_mesh_o3d
 from alfred import print_shape, logger
-from nosmpl.body_models import SMPLH
+from nosmpl.body_models import SMPLH, SMPL
 
-model_type = "smplh"
+'''
+Usage:
+
+You have to change the model paths to your own
+'''
+
+# model_type = "smplh"
+model_type = "smpl"
 
 if model_type == "smpl":
-    model = smplx.create(
+    model = SMPL(
         os.path.expanduser(
-            "~/data/face_and_pose/SMPL_python_v.1.1.0/smpl/models/SMPL_FEMALE.pkl"
+            "E:\\SMPLs\\SMPL_python_v.1.1.0\\smpl\\models\\SMPL_FEMALE.pkl"
         ),
         # model_type="smplx",
         model_type="smpl",
@@ -47,8 +54,18 @@ if model_type == "smpl":
         return_verts=True,
     )
 
-    vertices = output.vertices[0].detach().cpu().numpy().squeeze()
-    joints = output.joints[0].detach().cpu().numpy().squeeze()
+    torch.onnx.export(
+        model,
+        (None, global_orient, body_pose),
+        "smpl.onnx",
+        input_names=["global_orient", "body"],
+        output_names=["vertices", "joints", "faces"],
+    )
+    logger.info("exported smpl to onnx.")
+
+    vertices, joints = output
+    vertices = vertices.detach().cpu().numpy().squeeze()
+    joints = joints.detach().cpu().numpy().squeeze()
 
     faces = model.faces.astype(np.int32)
     vis_mesh_o3d(vertices, faces)

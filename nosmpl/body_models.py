@@ -386,16 +386,22 @@ class SMPL(nn.Module):
             joints += transl.unsqueeze(dim=1)
             vertices += transl.unsqueeze(dim=1)
 
-        # output = SMPLOutput(
-        #     vertices=vertices if return_verts else None,
-        #     global_orient=global_orient,
-        #     body_pose=body_pose,
-        #     joints=joints,
-        #     betas=betas,
-        #     full_pose=full_pose if return_full_pose else None,
-        # )
+        if torch.onnx.is_in_onnx_export():
+            return vertices, joints, self.faces_tensor
+        else:
+            # output = SMPLOutput(
+            #     vertices=vertices if return_verts else None,
+            #     global_orient=global_orient,
+            #     body_pose=body_pose,
+            #     joints=joints,
+            #     betas=betas,
+            #     full_pose=full_pose if return_full_pose else None,
+            # )
 
-        # return output
+            # return output
+            return vertices, joints
+
+     
 
 
 class SMPLLayer(SMPL):

@@ -17,6 +17,19 @@ This packages provides:
 
 STAR model download from: https://star.is.tue.mpg.de
 
+
+## SMPL ONNX Model Downloads
+
+I have exported 2 models, include `SMPL-H` and `SMPL`, which can cover most using scenarios:
+
+- `smpl`: [link](https://github.com/jinfagang/nosmpl/releases/download/v1.1/smpl_sim.onnx)
+- `smpl-h`: [link](https://github.com/jinfagang/nosmpl/releases/download/v1.0/smplh_sim_w_orien.onnx)
+
+They can also be found at github release.
+
+For usage, you can take examples like `examples/demo_smplh_onnx.py`.
+
+
 ## Updates
 
 - **`2023.02.28`**: An SMPL-H ONNX model released! Now You can using ONNXRuntime to get a 3D SMPL Mesh from a pose!
