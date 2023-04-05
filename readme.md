@@ -22,12 +22,33 @@ STAR model download from: https://star.is.tue.mpg.de
 
 I have exported 2 models, include `SMPL-H` and `SMPL`, which can cover most using scenarios:
 
-- `smpl`: [link](https://github.com/jinfagang/nosmpl/releases/download/v1.1/smpl_sim.onnx)
+- `smpl`: [link](https://github.com/jinfagang/nosmpl/releases/download/v1.1/smpl.onnx)
 - `smpl-h`: [link](https://github.com/jinfagang/nosmpl/releases/download/v1.0/smplh_sim_w_orien.onnx)
 
 They can also be found at github release.
 
 For usage, you can take examples like `examples/demo_smplh_onnx.py`.
+
+
+## Quick Start
+
+Now you can using `nosmpl` to visualize smpl with just few line of codes without **download any SMPL file**:
+
+```python
+from nosmpl.smpl_onnx import SMPLOnnxRuntime
+import numpy as np
+
+
+smpl = SMPLOnnxRuntime()
+
+body = np.random.randn(1, 23, 3).astype(np.float32)
+global_orient = np.random.randn(1, 1, 3).astype(np.float32)
+outputs = smpl.forward(body, global_orient)
+print(outputs)
+# you can visualize the verts with Open3D now.
+```
+
+So your predicted 3d pose such as SPIN, HMR, PARE etc, grap your model ouput, and through this `nosmpl` func, you will get your SMPL vertices!
 
 
 ## Updates
