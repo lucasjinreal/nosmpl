@@ -4,7 +4,7 @@
   <img src="https://jihulab.com/godly/fger/-/raw/c61e2e1d45afb82f48ced2bbcf6d6baa63f8f9a0/images/2023/04/5_22_41_32_37_1680705278.gif" />
 </p>
 
-> A tool can visualize SMPL in an easier way. Also you need is just `pip install nosmpl`.
+> A tool can visualize SMPL in an easier way. All you need is just `pip install nosmpl`.
 
 An enchanced and accelerated SMPL operation which commonly used in 3D human mesh generation. It takes a poses, shapes, cam_trans as inputs, outputs a high-dimensional 3D mesh verts.
 
