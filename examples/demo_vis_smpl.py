@@ -19,7 +19,8 @@ model_type = "smpl"
 if model_type == "smpl":
     model = SMPL(
         os.path.expanduser(
-            "E:\\SMPLs\\SMPL_python_v.1.1.0\\smpl\\models\\SMPL_FEMALE.pkl"
+            # "E:\\SMPLs\\SMPL_python_v.1.1.0\\smpl\\models\\SMPL_FEMALE.pkl"
+            "H:\\permanent\\smpl_models_all\\SMPL_python_v.1.1.0\\smpl\\models\\basicmodel_f_lbs_10_207_0_v1.1.0.pkl"
         ),
         # model_type="smplx",
         model_type="smpl",
