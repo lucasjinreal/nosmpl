@@ -5,6 +5,10 @@ import torch
 import smplx
 from nosmpl.vis.vis_o3d import vis_mesh_o3d
 from alfred import print_shape
+from nosmpl.utils.progress import prange
+
+for i in prange(4):
+    print(i)
 
 model_type = "smplx"
 
