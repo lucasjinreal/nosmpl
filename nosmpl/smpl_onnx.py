@@ -1,10 +1,7 @@
-try:
-    import onnxruntime as rt
-    from alfred.utils.file_io import download
-    import os
-    from alfred import logger
-except ImportError as e:
-    pass
+import onnxruntime as rt
+from alfred.utils.file_io import download
+import os
+from alfred import logger
 
 
 '''
