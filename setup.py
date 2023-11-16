@@ -3,7 +3,7 @@ import setuptools
 with open("readme.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-REQUIREMENTS = ["numpy", "opencv-python", "alfred-py"]
+REQUIREMENTS = ["numpy", "opencv-python", "alfred-py", "onnxruntime", "rich"]
 
 setuptools.setup(
     name="nosmpl",
